@@ -1,7 +1,7 @@
 
 # files
 
-EXE = polyglot
+EXE = obookmkr
 
 OBJS = adapter.o attack.o board.o book.o book_make.o book_merge.o colour.o \
        engine.o epd.o fen.o game.o hash.o io.o line.o list.o main.o move.o \

@@ -29,8 +29,10 @@ static const int NIL = -1;
 struct entry_t {
    uint64 key;
    uint16 move;
-   uint16 n;
+   uint32 n;
    uint16 sum;
+   uint32 whitewins;
+   uint32 draws;
    uint16 colour;
 };
 
@@ -208,6 +210,7 @@ static void book_insert(const char file_name[]) {
    char string[256];
    int move;
    int pos;
+   int colour;
 
    ASSERT(file_name!=NULL);
 
@@ -246,9 +249,11 @@ static void book_insert(const char file_name[]) {
 
             Book->entry[pos].n++;
             Book->entry[pos].sum += result+1;
-
-            if (Book->entry[pos].n >= COUNT_MAX) {
-               halve_stats(board->key);
+	    
+            if (result==0) {
+               Book->entry[pos].draws++;
+            } else if (my_string_equal(pgn->result,"1-0")) {
+               Book->entry[pos].whitewins++;
             }
 
             move_do(board,move);
@@ -318,9 +323,9 @@ static void book_save(const char file_name[]) {
 
       write_integer(file,8,Book->entry[pos].key);
       write_integer(file,2,Book->entry[pos].move);
-      write_integer(file,2,entry_score(&Book->entry[pos]));
-      write_integer(file,2,0);
-      write_integer(file,2,0);
+      write_integer(file,1,round((Book->entry[pos].whitewins * 100) / Book->entry[pos].n));
+      write_integer(file,1,round((Book->entry[pos].draws * 100) / Book->entry[pos].n));
+      write_integer(file,4,Book->entry[pos].n);
    }
 
    fclose(file);
@@ -377,6 +382,8 @@ static int find_entry(const board_t * board, int move) {
    Book->entry[pos].move = move;
    Book->entry[pos].n = 0;
    Book->entry[pos].sum = 0;
+   Book->entry[pos].whitewins = 0;
+   Book->entry[pos].draws = 0;
    Book->entry[pos].colour = board->turn;
 
    // insert into the hash table

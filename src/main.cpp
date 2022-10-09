@@ -71,7 +71,7 @@ int main(int argc, char * argv[]) {
    }
 
    util_init();
-   printf("PolyGlot %s by Fabien Letouzey\n",Version);
+   printf("obookmkr, based on PolyGlot %s by Fabien Letouzey\n",Version);
 
    option_init();
 
